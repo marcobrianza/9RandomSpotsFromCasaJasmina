@@ -1,8 +1,12 @@
 
-//
+// Marco Brianza May June 2015 //
+// 9 randoms spots from Casa Jasmina //
+
+
+
 // set true for casa Jasmina False for remote friends
-//boolean const CASA=true; String Name="9ColorSpots"; 
-boolean const CASA=false; String Name="9ColorSpotsFriend";
+boolean const CASA=true; String Name="9ColorSpots"; 
+//boolean const CASA=false; String Name="9ColorSpotsFriend";
 
 
 // LED data-----------------------------------------
@@ -17,7 +21,8 @@ struct LED {
 };
 
 const int SPOTS=9;
-const int N_LEDS=4; const int LEDS_SIDE=14;
+const int N_LEDS=4; // number of LED for each spot
+const int LEDS_SIDE=14; //matrix side
 
 
 LED spots[SPOTS];
@@ -25,7 +30,8 @@ int colori[SPOTS];
 
 int PANEL_LEDS=LEDS_SIDE*LEDS_SIDE;
 
-int pixels[SPOTS][4]={
+// this is the LED index that form a specific spot
+int pixels[SPOTS][N_LEDS]={
 { 15,  16,  39,  40},
 {95, 96, 99, 100},
 {155, 156, 179, 180},
@@ -37,6 +43,7 @@ int pixels[SPOTS][4]={
 {165, 166, 169, 170},
 };
 
+// pins for serial comunication with LEDs
 int LED_CLOCK_PIN = 9;
 int LED_DATA_PIN = 8;
 
@@ -45,8 +52,8 @@ int GEIGER_SIG_PIN = 2;
 int signCount=0;  //Counter for Radiation Pulse
 int sON=0;//Lock flag for Radiation Pulse
 
-long MAX_C=16;
-long MAX_P=9;
+long MAX_C=16; // number of variaitons per each color
+long MAX_P=9;  // number of spots
 
 long MAX_CI=MAX_C*MAX_C*MAX_C;
 long MAX_NUM=MAX_CI*MAX_P;
@@ -62,12 +69,11 @@ SpacebrewYun sb = SpacebrewYun(Name, "from casa Jasmina");
 
 void setup() {
 
-  
   Serial.begin(115200);
   pinMode(LED_CLOCK_PIN, OUTPUT);
   pinMode(LED_DATA_PIN, OUTPUT); 
   
- sendColor(PANEL_LEDS,0,0,0);
+  sendColor(PANEL_LEDS,0,0,0);
  
  // start-up the bridge
 Bridge.begin();
@@ -76,14 +82,12 @@ sb.verbose(false); // configure the spacebrew object to print status messages to
  
  if (CASA){
  Serial.println("Casa mode");  
- //sb.addPublish("spot", "string"); // configure the spacebrew publisher and subscriber
- sb.addPublish("allSpots", "string"); // configure the spacebrew publisher and 
+ sb.addPublish("allSpots", "string");
  pinMode(GEIGER_SIG_PIN,INPUT_PULLUP);
  }
  else{
    Serial.println("Friend mode");
    sb.addSubscribe("allSpots", "string");
-   	// register the string message handler method 
    sb.onStringMessage(handleString);
  }
  
@@ -163,18 +167,16 @@ void sendSpots(){
      Serial.println("sending allSpots: "+cs);
      sb.send("allSpots", cs); 
      
-   }
-
-   
+   } 
 }
 
 void handleString (String route, String value) {
 	// print the message that was received
-	Serial.print("From ");
-	Serial.print(route);
-	Serial.print(", received msg: ");
-	Serial.println(value);
-Serial.println();
+//	Serial.print("From ");
+//	Serial.print(route);
+//	Serial.print(", received msg: ");
+//	Serial.println(value);
+//  Serial.println();
 
 
 
@@ -183,7 +185,7 @@ if (route=="allSpots"){
   String temp;
   int j=0;
   
- Serial.println("new allSpot");
+ Serial.println("new allSpot ");
  for(int i=0; i<value.length();i++){
   char c=value[i];
   if (c==',')
