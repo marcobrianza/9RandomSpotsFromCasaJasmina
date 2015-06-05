@@ -44,11 +44,12 @@ int pixels[SPOTS][N_LEDS]={
 };
 
 // pins for serial comunication with LEDs
-int LED_CLOCK_PIN = 9;
-int LED_DATA_PIN = 8;
+int LED_CLOCK_PIN = A0;
+int LED_DATA_PIN = A2;
 
 // geiger counter data -----------------------------
 int GEIGER_SIG_PIN = 2; 
+int GEIGER_NS_PIN=4;
 int signCount=0;  //Counter for Radiation Pulse
 int sON=0;//Lock flag for Radiation Pulse
 
@@ -74,6 +75,8 @@ void setup() {
   pinMode(LED_DATA_PIN, OUTPUT); 
   
   sendColor(PANEL_LEDS,0,0,0);
+
+ delay (60000); // time to let  linux start
  
  // start-up the bridge
 Bridge.begin();
@@ -81,18 +84,19 @@ sb.verbose(false); // configure the spacebrew object to print status messages to
 
  
  if (CASA){
- Serial.println("Casa mode");  
- sb.addPublish("allSpots", "string");
- pinMode(GEIGER_SIG_PIN,INPUT_PULLUP);
+  Serial.println("Casa mode");  
+  sb.addPublish("allSpots", "string");
+  pinMode(GEIGER_SIG_PIN,INPUT_PULLUP);
+  pinMode(GEIGER_NS_PIN,INPUT_PULLUP);
+ 
  }
  else{
    Serial.println("Friend mode");
    sb.addSubscribe("allSpots", "string");
    sb.onStringMessage(handleString);
  }
- 
- sb.connect("net.marcobrianza.it"); // connect to cloud spacebrew server
-delay (1000);
+
+sb.connect("spacebrew.marcobrianza.it"); // connect to cloud spacebrew server
 sb.monitor();
 
 }
@@ -123,10 +127,11 @@ void loop() {
    long r=-1;
    
   // Raw data of Radiation Pulse: Not-detected -> High, Detected -> Low
-  byte sign = digitalRead(GEIGER_SIG_PIN);
+  byte sign = digitalRead(GEIGER_SIG_PIN);   // Raw data of Radiation Pulse: Not-detected -> High, Detected -> Low
+  byte noise = digitalRead(GEIGER_NS_PIN);    // Raw data of Noise Pulse: Not-detected -> Low, Detected -> High
 
   //Radiation Pulse normally keeps low for about 100[usec]
-  if(sign==0 && sON==0)
+  if(sign==0 && sON==0 && noise==0)
     {//Deactivate Radiation Pulse counting for a while
       sON = 1;
   

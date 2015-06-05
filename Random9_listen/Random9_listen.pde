@@ -9,7 +9,7 @@ int U=100; // scal unit
 
 import spacebrew.*;
 Spacebrew sb;
-String server="net.marcobrianza.it";
+String server="spacebrew.marcobrianza.it";
 String name="9ColorSpotsFriendP5";
 String description ="Reading Colors";
 
