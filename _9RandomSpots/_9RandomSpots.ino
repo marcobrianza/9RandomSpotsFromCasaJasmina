@@ -1,5 +1,5 @@
 
-// Marco Brianza May June 2015 //
+// Marco Brianza  June 2015 //
 // 9 randoms spots from Casa Jasmina //
 
 
@@ -76,7 +76,7 @@ void setup() {
   
   sendColor(PANEL_LEDS,0,0,0);
 
- delay (60000); // time to let  linux start
+ //delay (60000); // time to let  linux start
  
  // start-up the bridge
 Bridge.begin();
@@ -97,6 +97,7 @@ sb.verbose(false); // configure the spacebrew object to print status messages to
  }
 
 sb.connect("spacebrew.marcobrianza.it"); // connect to cloud spacebrew server
+delay(1000);
 sb.monitor();
 
 }
